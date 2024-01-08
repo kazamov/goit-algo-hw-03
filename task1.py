@@ -29,10 +29,6 @@ def read_arguments():
 
     try:
         args = parser.parse_args()
-
-        print("source: ", args.source)
-        print("destination: ", args.destination)
-
     except SystemExit as err:
         raise ApplicationError("Invalid arguments") from err
 
@@ -43,14 +39,8 @@ def read_arguments():
 def convert_to_paths(source: str, destination: str):
     source_path = pathlib.Path(source)
 
-    if not destination:
-        destination_path = pathlib.Path(source_path / "dist").resolve()
-        os.makedirs(destination_path)
-    else:
-        destination_path = pathlib.Path(destination)
-
-    if not source_path.is_absolute() or not destination_path.is_absolute():
-        raise ApplicationError("Source or destination path is not absolute")
+    if not source_path.is_absolute():
+        raise ApplicationError("Source path is not absolute")
 
     if not source_path.exists():
         raise ApplicationError("Source path does not exist")
@@ -58,12 +48,21 @@ def convert_to_paths(source: str, destination: str):
     if not source_path.is_dir():
         raise ApplicationError("Source path should be a directory")
 
-    if not destination_path.is_dir():
-        raise ApplicationError("Destination path should be a directory")
+    if not destination:
+        destination_path = pathlib.Path(source_path / "dist").resolve()
+        os.makedirs(destination_path, exist_ok=True)
+    else:
+        destination_path = pathlib.Path(destination)
+
+    if not destination_path.is_absolute():
+        raise ApplicationError("Destination path is not absolute")
 
     if destination_path.exists():
+        if not destination_path.is_dir():
+            raise ApplicationError("Destination path should be a directory")
         shutil.rmtree(destination_path)
-    os.makedirs(destination_path)
+
+    os.makedirs(destination_path, exist_ok=True)
 
     return source_path, destination_path
 
@@ -134,8 +133,12 @@ def main():
 
         source_path, destination_path = convert_to_paths(source, destination)
 
+        print("Source path:", source_path)
+        print("Destination path:", destination_path)
+
         copy_files(source_path, destination_path)
 
+        print("Files copied successfully")
     except ApplicationError as err:
         print(err.message)
         return
