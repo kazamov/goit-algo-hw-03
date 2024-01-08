@@ -25,7 +25,6 @@ def read_arguments():
         "-d",
         "--destination",
         help="Absolute path to destination directory",
-        default="C:\\dist",
     )
 
     try:
@@ -43,7 +42,12 @@ def read_arguments():
 
 def convert_to_paths(source: str, destination: str):
     source_path = pathlib.Path(source)
-    destination_path = pathlib.Path(destination)
+
+    if not destination:
+        destination_path = pathlib.Path(source_path / "dist").resolve()
+        os.makedirs(destination_path)
+    else:
+        destination_path = pathlib.Path(destination)
 
     if not source_path.is_absolute() or not destination_path.is_absolute():
         raise ApplicationError("Source or destination path is not absolute")
