@@ -4,7 +4,7 @@
 
 run the command: python task1.py --source "C:\test"
 
-## Task 1
+## Task 2
 
 run the command: python task2.py
 and type an integer number from 0 to 5
