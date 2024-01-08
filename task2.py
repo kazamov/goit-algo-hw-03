@@ -37,4 +37,12 @@ def draw_koch_snowflake(order, size=300):
 
 
 if __name__ == "__main__":
-    draw_koch_snowflake(3)
+    try:
+        order_input = int(input("Enter the order of the snowflake (from 0 to 5): "))
+
+        if order_input < 0 or order_input > 5:
+            raise ValueError
+
+        draw_koch_snowflake(order_input)
+    except ValueError:
+        print("The order should be an integer number from 0 to 5")
